@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bing - Search Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0078d4 0%, #106ebe 50%, #005a9e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-left a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .nav-left a:hover {
+            opacity: 1;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .user-menu:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0078d4;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 50px 12px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 10;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: #f5f5f5;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .action-desc {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Background Elements */
+        .bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .bg-circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* News/Content Cards */
+        .content-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 40px;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .content-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            padding: 20px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Performance Dashboard Toggle */
+        .perf-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .perf-toggle:hover {
+            background: #106ebe;
+            transform: translateY(-2px);
+        }
+
+        /* Performance Dashboard */
+        .performance-dashboard {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .performance-dashboard.visible {
+            right: 0;
+        }
+
+        .dashboard-header {
+            background: #0078d4;
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .dashboard-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .dashboard-content {
+            padding: 20px;
+            color: #333;
+        }
+
+        .metric-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+
+        .metric-item.good {
+            border-left-color: #28a745;
+        }
+
+        .metric-item.needs-improvement {
+            border-left-color: #ffc107;
+        }
+
+        .metric-item.poor {
+            border-left-color: #dc3545;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .metric-item.good .metric-value {
+            color: #28a745;
+        }
+
+        .metric-item.needs-improvement .metric-value {
+            color: #ffc107;
+        }
+
+        .metric-item.poor .metric-value {
+            color: #dc3545;
+        }
+
+        .metric-desc {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .dashboard-log {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 4px;
+            border-radius: 3px;
+        }
+
+        .log-entry.info {
+            background: #d1ecf1;
+        }
+
+        .log-entry.success {
+            background: #d4edda;
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 11px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .performance-dashboard {
+                width: 100%;
+                right: -100%;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .content-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-simulation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            z-index: 3000;
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Simulation -->
+    <div class="loading-simulation">
+        <div class="loading-bar" id="loading-bar"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-left">
+            <a href="#" onclick="simulateNavigation('Images')">Images</a>
+            <a href="#" onclick="simulateNavigation('Videos')">Videos</a>
+            <a href="#" onclick="simulateNavigation('Maps')">Maps</a>
+            <a href="#" onclick="simulateNavigation('News')">News</a>
+            <a href="#" onclick="simulateNavigation('Shopping')">Shopping</a>
+        </nav>
+        <nav class="nav-right">
+            <div class="user-menu" onclick="simulateUserAction()">
+                <div class="user-avatar">U</div>
+                <span>User</span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Background Elements -->
+    <div class="bg-elements">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="logo">Bing</h1>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search the web" id="search-input">
+            <div class="search-icon" onclick="performSearch()">🔍</div>
+            <div class="search-suggestions" id="suggestions">
+                <div class="suggestion-item" onclick="selectSuggestion('performance testing')">performance testing</div>
+                <div class="suggestion-item" onclick="selectSuggestion('web vitals')">web vitals</div>
+                <div class="suggestion-item" onclick="selectSuggestion('core web vitals')">core web vitals</div>
+                <div class="suggestion-item" onclick="selectSuggestion('website optimization')">website optimization</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-card" onclick="simulateAction('Weather')">
+                <div class="action-icon">🌤️</div>
+                <div class="action-title">Weather</div>
+                <div class="action-desc">Get current weather and forecast</div>
+            </div>
+            <div class="action-card" onclick="simulateAction('News')">
+                <div class="action-icon">📰</div>
+                <div class="action-title">Latest News</div>
+                <div class="action-desc">Stay updated with breaking news</div>
+            </div>
+            <div class="action-card" onclick="simulateAction('Translate')">
+                <div class="action-icon">🌐</div>
+                <div class="action-title">Translate</div>
+                <div class="action-desc">Translate text between languages</div>
+            </div>
+            <div class="action-card" onclick="simulateAction('Calculator')">
+                <div class="action-icon">🧮</div>
+                <div class="action-title">Calculator</div>
+                <div class="action-desc">Quick calculations and conversions</div>
+            </div>
+        </div>
+
+        <div class="content-cards">
+            <div class="content-card">
+                <div class="card-image">📈 Trending</div>
+                <div class="card-title">Performance Optimization Tips</div>
+                <div class="card-desc">Learn how to improve your website's Core Web Vitals and user experience with these proven techniques.</div>
+            </div>
+            <div class="content-card">
+                <div class="card-image">🔬 Technology</div>
+                <div class="card-title">Web Development Insights</div>
+                <div class="card-desc">Discover the latest trends in web development, from modern frameworks to performance monitoring tools.</div>
+            </div>
+            <div class="content-card">
+                <div class="card-image">🎯 Business</div>
+                <div class="card-title">Digital Marketing Strategies</div>
+                <div class="card-desc">Effective strategies to boost your online presence and improve conversion rates through better user experience.</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <a href="#" onclick="simulateNavigation('Privacy')">Privacy</a>
+        <a href="#" onclick="simulateNavigation('Terms')">Terms</a>
+        <a href="#" onclick="simulateNavigation('Help')">Help</a>
+        <a href="#" onclick="simulateNavigation('About')">About</a>
+    </footer>
+
+    <!-- Performance Dashboard Toggle -->
+    <button class="perf-toggle" onclick="toggleDashboard()">📊 Performance</button>
+
+    <!-- Performance Dashboard -->
+    <div class="performance-dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <h3>Performance Metrics</h3>
+            <button class="close-btn" onclick="toggleDashboard()">×</button>
+        </div>
+        <div class="dashboard-content">
+            <div class="metric-item" id="fcp-metric">
+                <div class="metric-label">First Contentful Paint (FCP)</div>
+                <div class="metric-value" id="fcp-value">--</div>
+                <div class="metric-desc">Time until first text/image is painted</div>
+            </div>
+            <div class="metric-item" id="lcp-metric">
+                <div class="metric-label">Largest Contentful Paint (LCP)</div>
+                <div class="metric-value" id="lcp-value">--</div>
+                <div class="metric-desc">Time until largest element is painted</div>
+            </div>
+            <div class="metric-item" id="fid-metric">
+                <div class="metric-label">First Input Delay (FID)</div>
+                <div class="metric-value" id="fid-value">--</div>
+                <div class="metric-desc">Delay before first interaction response</div>
+            </div>
+            <div class="metric-item" id="cls-metric">
+                <div class="metric-label">Cumulative Layout Shift (CLS)</div>
+                <div class="metric-value" id="cls-value">--</div>
+                <div class="metric-desc">Total unexpected layout shifts</div>
+            </div>
+            <div class="metric-item" id="ttfb-metric">
+                <div class="metric-label">Time to First Byte (TTFB)</div>
+                <div class="metric-value" id="ttfb-value">--</div>
+                <div class="metric-desc">Time to receive first byte</div>
+            </div>
+            <div class="metric-item" id="inp-metric">
+                <div class="metric-label">Interaction to Next Paint (INP)</div>
+                <div class="metric-value" id="inp-value">--</div>
+                <div class="metric-desc">Interaction responsiveness</div>
+            </div>
+            
+            <div class="dashboard-log" id="dashboard-log">
+                <div class="log-entry info">
+                    <span class="timestamp">[Loading]</span> Initializing performance monitoring...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Vitals Script -->
+    <script type="module">
+        import { onCLS, onFCP, onFID, onLCP, onTTFB, onINP } from 'https://unpkg.com/web-vitals@3?module';
+
+        // Performance tracking
+        const metrics = {};
+        let logEntries = [];
+
+        // Utility functions
+        function formatValue(value, unit = 'ms') {
+            if (typeof value === 'number') {
+                if (unit === 'ms') {
+                    return value < 1000 ? `${Math.round(value)}ms` : `${(value / 1000).toFixed(2)}s`;
+                }
+                return value.toFixed(3);
+            }
+            return '--';
+        }
+
+        function getThresholdClass(metric, value) {
+            const thresholds = {
+                FCP: { good: 1800, needsImprovement: 3000 },
+                LCP: { good: 2500, needsImprovement: 4000 },
+                FID: { good: 100, needsImprovement: 300 },
+                CLS: { good: 0.1, needsImprovement: 0.25 },
+                TTFB: { good: 600, needsImprovement: 1500 },
+                INP: { good: 200, needsImprovement: 500 }
+            };
+
+            const threshold = thresholds[metric];
+            if (!threshold || value === null || value === undefined) return '';
+
+            if (value <= threshold.good) return 'good';
+            if (value <= threshold.needsImprovement) return 'needs-improvement';
+            return 'poor';
+        }
+
+        function updateMetric(metricName, value, unit = 'ms') {
+            const metricElement = document.getElementById(`${metricName.toLowerCase()}-metric`);
+            const valueElement = document.getElementById(`${metricName.toLowerCase()}-value`);
+            
+            if (metricElement && valueElement) {
+                valueElement.textContent = formatValue(value, unit);
+                
+                // Remove existing classes
+                metricElement.classList.remove('good', 'needs-improvement', 'poor');
+                
+                // Add threshold class
+                const thresholdClass = getThresholdClass(metricName.toUpperCase(), value);
+                if (thresholdClass) {
+                    metricElement.classList.add(thresholdClass);
+                }
+            }
+        }
+
+        function addLogEntry(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logContainer = document.getElementById('dashboard-log');
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Keep last 20 entries
+            const entries = logContainer.children;
+            if (entries.length > 20) {
+                logContainer.removeChild(entries[0]);
+            }
+        }
+
+        // Initialize performance monitoring
+        function initPerformanceMonitoring() {
+            addLogEntry('Performance monitoring initialized', 'success');
+
+            // First Contentful Paint
+            onFCP((metric) => {
+                metrics.FCP = metric;
+                updateMetric('FCP', metric.value);
+                addLogEntry(`FCP: ${formatValue(metric.value)} (${metric.rating})`, 'success');
+            });
+
+            // Largest Contentful Paint
+            onLCP((metric) => {
+                metrics.LCP = metric;
+                updateMetric('LCP', metric.value);
+                addLogEntry(`LCP: ${formatValue(metric.value)} (${metric.rating})`, 'success');
+            });
+
+            // First Input Delay
+            onFID((metric) => {
+                metrics.FID = metric;
+                updateMetric('FID', metric.value);
+                addLogEntry(`FID: ${formatValue(metric.value)} (${metric.rating})`, 'success');
+            });
+
+            // Cumulative Layout Shift
+            onCLS((metric) => {
+                metrics.CLS = metric;
+                updateMetric('CLS', metric.value, '');
+                addLogEntry(`CLS: ${metric.value.toFixed(3)} (${metric.rating})`, 'success');
+            });
+
+            // Time to First Byte
+            onTTFB((metric) => {
+                metrics.TTFB = metric;
+                updateMetric('TTFB', metric.value);
+                addLogEntry(`TTFB: ${formatValue(metric.value)} (${metric.rating})`, 'success');
+            });
+
+            // Interaction to Next Paint
+            onINP((metric) => {
+                metrics.INP = metric;
+                updateMetric('INP', metric.value);
+                addLogEntry(`INP: ${formatValue(metric.value)} (${metric.rating})`, 'success');
+            });
+        }
+
+        // Interactive functions
+        window.toggleDashboard = function() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.classList.toggle('visible');
+        };
+
+        window.performSearch = function() {
+            const searchInput = document.getElementById('search-input');
+            const query = searchInput.value.trim();
+            
+            if (query) {
+                addLogEntry(`Search performed: "${query}"`, 'info');
+                simulateContentLoad();
+            }
+        };
+
+        window.selectSuggestion = function(suggestion) {
+            const searchInput = document.getElementById('search-input');
+            searchInput.value = suggestion;
+            document.getElementById('suggestions').style.display = 'none';
+            performSearch();
+        };
+
+        window.simulateAction = function(action) {
+            addLogEntry(`Action triggered: ${action}`, 'info');
+            simulateContentLoad();
+            
+            // Create some DOM changes to trigger CLS
+            const cards = document.querySelectorAll('.action-card');
+            cards.forEach((card, index) => {
+                if (index % 2 === 0) {
+                    setTimeout(() => {
+                        card.style.transform = 'scale(1.02)';
+                        setTimeout(() => {
+                            card.style.transform = 'scale(1)';
+                        }, 100);
+                    }, index * 50);
+                }
+            });
+        };
+
+        window.simulateNavigation = function(page) {
+            addLogEntry(`Navigation: ${page}`, 'info');
+            simulateContentLoad();
+        };
+
+        window.simulateUserAction = function() {
+            addLogEntry('User menu clicked', 'info');
+        };
+
+        function simulateContentLoad() {
+            const loadingBar = document.getElementById('loading-bar');
+            loadingBar.style.width = '0%';
+            
+            // Simulate progressive loading
+            setTimeout(() => loadingBar.style.width = '30%', 100);
+            setTimeout(() => loadingBar.style.width = '60%', 200);
+            setTimeout(() => loadingBar.style.width = '80%', 300);
+            setTimeout(() => loadingBar.style.width = '100%', 400);
+            setTimeout(() => loadingBar.style.width = '0%', 1000);
+            
+            // Add some dynamic content to trigger layout shifts
+            setTimeout(() => {
+                const mainContent = document.querySelector('.main-content');
+                const tempDiv = document.createElement('div');
+                tempDiv.style.cssText = `
+                    background: rgba(255,255,255,0.1); 
+                    padding: 20px; 
+                    margin: 20px 0; 
+                    border-radius: 8px;
+                    transition: all 0.3s;
+                `;
+                tempDiv.textContent = 'Dynamic content loaded...';
+                mainContent.appendChild(tempDiv);
+                
+                setTimeout(() => {
+                    tempDiv.style.height = '60px';
+                    tempDiv.style.background = 'rgba(255,255,255,0.05)';
+                }, 200);
+                
+                setTimeout(() => {
+                    if (tempDiv.parentNode) {
+                        tempDiv.parentNode.removeChild(tempDiv);
+                    }
+                }, 2000);
+            }, 500);
+        }
+
+        // Search suggestions handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const suggestions = document.getElementById('suggestions');
+            
+            searchInput.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    suggestions.style.display = 'block';
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    suggestions.style.display = 'none';
+                }
+            });
+            
+            // Initialize performance monitoring
+            initPerformanceMonitoring();
+            
+            // Simulate some initial interactions to generate metrics
+            setTimeout(() => {
+                addLogEntry('Page fully loaded and interactive', 'success');
+            }, 1000);
+        });
+
+        // Add some interaction delay for FID testing
+        document.addEventListener('click', function(e) {
+            const start = performance.now();
+            // Simulate some processing time
+            while (performance.now() - start < 10) {
+                // Small delay to measure FID
+            }
+        });
+
+        // Export metrics function
+        window.exportMetrics = function() {
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                metrics: metrics,
+                pageType: 'Bing Search Engine Mimic'
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bing-mimic-metrics-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addLogEntry('Metrics exported successfully', 'success');
+        };
+    </script>
+</body>
+</html>
